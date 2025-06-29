@@ -1,19 +1,15 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import joblib
-import pandas as pd
-import nest_asyncio
-
-# Aplicar parche para correr async event loop en Colab
-nest_asyncio.apply()
+from joblib import load
+from pandas import DataFrame
 
 # Cargar modelo
-modelo = joblib.load('xgb_pipeline_final.pkl')
+modelo = load('xgb_pipeline_final.pkl')
 
 # Crear app
 app = FastAPI()
 
-# Clase de entrada (ajústala a tus columnas)
+# Clase de entrada (ajustala a tus columnas)
 class InputData(BaseModel):
     Age: float
     StudyTimeWeekly: float
@@ -30,6 +26,6 @@ class InputData(BaseModel):
 
 @app.post("/predict")
 def predict(data: InputData):
-    df = pd.DataFrame([data.dict()])
+    df = DataFrame([data.dict()])
     pred = modelo.predict(df)
     return {"prediction": int(pred[0])}
